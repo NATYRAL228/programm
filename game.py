@@ -1,12 +1,33 @@
 import pygame as pg
-a = pg.image.load('C:/Users/Ученик_8/Downloads/programm-main/pngwing.com.png')
-pga = pg.image.load('C:/Users/Ученик_8/Downloads/sergeyjpg.jpg')
+clock = pg.time.Clock()
+a = pg.image.load('pngwing.com.png')
+pga = pg.image.load('sergeyjpg.jpg')
 pg.init()
 font_name = pg.font.match_font('arial') #поиск шифта arial
 size = 18 #размер шрифта
 W,H = 600,600
 win = pg.display.set_mode((W, H)) # переменная чтобы создать игровое окно
 name = ' '
+class Player(pg.sprite.Sprite):
+    def __init__(self, x,y):
+        pg.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.speed_x = 1
+        self.speed_y = 0
+        self.image = pg.image.load('zm.png')
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.x
+        self.rect.bottom = self.y
+    def update(self):
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+        key = pg.key.get_pressed()
+        if key[pg.K_LEFT]:
+            self.speed_x = -1
+all_sprites = pg.sprite.Group()
+player = Player(300,300)
+all_sprites.add(player)
 def draw_text(surf, text, x,y, size=size, color=(255,255,255)):
     font = pg.font.Font(font_name, size) #определяет шрифт
     text_surface = font.render(text,True,color)
@@ -43,6 +64,11 @@ while 1:
       exit()
   win.fill((0, 0, 0))
   win.blit(pga, (0, 0))
+  all_sprites.update()
+  all_sprites.draw(win)
+  clock.tick(60)
+
+
 
   for vertic in range(0,600,20):
       pg.draw.line(win,(255,0,0),(0,vertic),(600,vertic))
