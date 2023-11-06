@@ -1,6 +1,6 @@
 import pygame as pg
 from sql_bd import DateBaseSQL
-score = 'Score 0'
+import random
 bd = DateBaseSQL
 clock = pg.time.Clock()
 apl = pg.image.load('apl.png')
@@ -15,14 +15,13 @@ name = ' '
 class Apple(pg.sprite.Sprite):
     def __init__(self, x,y):
         pg.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.speed_x = 0
-        self.speed_y = 0
         self.image = pg.image.load('apl.png')
         self.rect = self.image.get_rect()
-        self.rect.centerx = self.x
-        self.rect.bottom = self.y
+        self.rect.centerx = random.randrange(0,570)
+        self.rect.bottom = random.randrange(0,570)
+    def new_pos(self):
+        self.rect.x = random.randrange(0,570)
+        self.rect.y = random.randrange(0,570)
 class Player(pg.sprite.Sprite):
     def __init__(self, x,y):
         pg.sprite.Sprite.__init__(self)
@@ -32,25 +31,59 @@ class Player(pg.sprite.Sprite):
         self.speed_y = 0
         self.image = pg.image.load('zm.png')
         self.rect = self.image.get_rect()
-        self.rect.centerx = self.x
-        self.rect.bottom = self.y
+        self.rect.x = x
+        self.rect.y = y
 
     def update(self):
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
         key = pg.key.get_pressed()
         if key[pg.K_LEFT]:
-            self.speed_x = -1
+            if self.speed_x != 1:
+                self.speed_x = -1
+                self.speed_y = 0
         if key[pg.K_RIGHT]:
-            self.speed_x = +1
-        if key[pg.K_DOWN]:
-            self.speed_y = +1
+           if self.speed_x != -1:
+            self.speed_x = 1
+            self.speed_y = 0
         if key[pg.K_UP]:
-            self.speed_y = -1
+            if self.speed_y != -1:
+                self.speed_x = 0
+                self.speed_y = -1
+        if key[pg.K_DOWN]:
+           if self.speed_y != 1:
+                self.speed_x = 0
+                self.speed_y = 1
+class Tail(pg.sprite.Sprite):
+    def __init__(self,*group):
+        super().__init__(*group)
+        self.speed_x = player.speed_x
+        self.speed_y = player.speed_y
+        self.image = pg.image.load('zm.png')
+        self.rect = self.image.get_rect()
+        self.rect.x = player.rect.x
+        self.rect.y = player.rect.y
+        self.direction_list = []
+        self.step = 0
+    def update(self):
+        if self.direction_list != [] and self.step < len(self.direction_list):
+            if self.direction_list[self.step][1] == [self.rect.x,self.y]:
+                self.speed_x = self.direction_list[self.step][0][0]
+                self.speed_y = self.direction_list[self.step][0][1]
+                self.step += 1
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+
+    def append_direction(self,dir,pos):
+        self.direction_list.append([dir,pos])
+        self.update()
 all_sprites = pg.sprite.Group()
 apple = Apple(50,50)
+apple_sprites = pg.sprite.Group()
+apple_sprites.add(apple)
+tail_sprites = pg.sprite.Group()
 player = Player(300,300)
-all_sprites.add(player,apple)
+all_sprites.add(player)
 def draw_text(surf, text, x,y, size=size, color=(255,255,255)):
     font = pg.font.Font(font_name, size) #определяет шрифт
     text_surface = font.render(text,True,color)
@@ -80,7 +113,7 @@ while mainloop:
     draw_text(win, 'Введите имя:', W//2,H//2)
     draw_text(win,name,W//2,H//2 + 20)
     pg.display.update()
-
+score = 0
 while 1:
   for i in pg.event.get():
     if i.type == pg.QUIT:
@@ -99,5 +132,17 @@ while 1:
   for horiz in range(0, 600, 20):
       pg.draw.line(win, (0, 255, 0), (horiz, 0), (horiz, 600))
   draw_text(win,name,W//2, 10,color=(255,0,0))
-  draw_text(win,str(score),W//6, 10,color=(0,255,0))
+  draw_text(win,str(score),W//6, 10,color=(0,0,255))
+  all_sprites.update()
+  all_sprites.draw(win)
+  apple_sprites.update()
+  apple_sprites.draw(win)
+  if score != 0:
+      tail_sprites.update()
+      tail_sprites.draw(win)
+  collision = pg.sprite.spritecollide(player,apple_sprites, False, pg.sprite.collide_mask)
+  if collision:
+      score += 1
+      apple.new_pos()
+      Tail(tail_sprites)
   pg.display.update()
