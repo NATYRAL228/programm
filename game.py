@@ -39,21 +39,29 @@ class Player(pg.sprite.Sprite):
         self.rect.y += self.speed_y
         key = pg.key.get_pressed()
         if key[pg.K_LEFT]:
-            if self.speed_x != 1:
+            if self.speed_x == 0:
                 self.speed_x = -1
                 self.speed_y = 0
+            for tail in tail_sprites.sprites():
+                tail.append_direction([{0}],[{1}])
         if key[pg.K_RIGHT]:
-           if self.speed_x != -1:
+           if self.speed_x == 0:
             self.speed_x = 1
             self.speed_y = 0
+            for tail in tail_sprites.sprites():
+                tail.append_direction([{1}],[{1}])
         if key[pg.K_UP]:
-            if self.speed_y != -1:
+            if self.speed_y == 0:
                 self.speed_x = 0
                 self.speed_y = -1
+            for tail in tail_sprites.sprites():
+                tail.append_direction([{1}],[{1}])
         if key[pg.K_DOWN]:
-           if self.speed_y != 1:
+           if self.speed_y == 0:
                 self.speed_x = 0
                 self.speed_y = 1
+            for tail in tail_sprites.sprites():
+                tail.append_direction([{0}],[{1}])
 class Tail(pg.sprite.Sprite):
     def __init__(self,*group):
         super().__init__(*group)
@@ -146,3 +154,22 @@ while 1:
       apple.new_pos()
       Tail(tail_sprites)
   pg.display.update()
+
+SQL.set(name, score)
+while 1:
+    for i in pg.event.get():
+        if i.type == pg.QUIT:
+            exit()
+            
+    win.fill(BLACK)
+    offset = 20
+    step = 0
+    for u_name, u_score in SQL.get():
+        step += 1
+        draw_text(win, (f'{u_name}: {u_score}'), WIDTH // 2 - 10, HEIGHT - 180 - offset * 2)
+        offset -= 20
+    step = 0
+    draw_text(win, 'Game Over', WIDTH //2, HEIGHT - 450)
+    draw_text(win, f'Ввш результать: {score}', WIDTH // 2, HEIGHT // 2)
+    draw_text(win, 'Best scores:', WIDTH // 2, HEIGHT - 250)
+    pg.display.flip()
