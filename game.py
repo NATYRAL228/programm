@@ -11,7 +11,7 @@ pga = pg.image.load('sergeyjpg.jpg')
 kar = pg.image.load('kar.png')
 zem = pg.image.load('zem.png')
 yl = pg.image.load('yl.png')
-lis = [k,a,pga,kar,zem,yl]
+lis = [k, a, pga, kar, zem, yl]
 pg.init()
 font_name = pg.font.match_font('arial')  # поиск шифта arial
 size = 18  # размер шрифта
@@ -79,7 +79,6 @@ class Player(pg.sprite.Sprite):
                 self.speed_y = 1
 
 
-
 class Tail(pg.sprite.Sprite):
     def __init__(self, *group):
         super().__init__(*group)
@@ -94,16 +93,17 @@ class Tail(pg.sprite.Sprite):
 
     def update(self):
         if self.direction_list != [] and self.step < len(self.direction_list):
-            if self.direction_list[self.step][1] == [self.rect.x,self.rect.y]:
+            if self.direction_list[self.step][1] == [self.rect.x, self.rect.y]:
                 self.speed_x = self.direction_list[self.step][0][0]
                 self.speed_y = self.direction_list[self.step][0][1]
                 self.step += 1
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
-    def append_direction(self,dir,pos):
-        self.direction_list.append([dir,pos])
+    def append_direction(self, dir, pos):
+        self.direction_list.append([dir, pos])
         self.update()
+
 
 collision = False
 all_sprites = pg.sprite.Group()
@@ -174,7 +174,7 @@ while 1:
         tail_sprites.update()
         tail_sprites.draw(win)
     collision = pg.sprite.spritecollide(player, apple_sprites, False, pg.sprite.collide_mask)
-    end = pg.sprite.spritecollide(player,tail_sprites,False, pg.sprite.collide_mask)
+    end = pg.sprite.spritecollide(player, tail_sprites, False, pg.sprite.collide_mask)
     if end:
         break
     if collision:
@@ -191,12 +191,12 @@ while 1:
         if i.type == pg.QUIT:
             exit()
 
-    win.fill((0,0,0))
+    win.fill((0, 0, 0))
     offset = 20
     step = 0
     for u_name, u_score in SQL.get():
         step += 1
-        draw_text(win, (f'{u_name}: {u_score}'), W// 2 - 10, H - 180 - offset * 2)
+        draw_text(win, (f'{u_name}: {u_score}'), W // 2 - 10, H - 180 - offset * 2)
         offset -= 20
     step = 0
     draw_text(win, 'Game Over', W // 2, H - 450)
